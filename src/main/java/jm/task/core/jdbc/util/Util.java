@@ -1,5 +1,10 @@
 package jm.task.core.jdbc.util;
 
+import jm.task.core.jdbc.model.User;
+import org.hibernate.HibernateException;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -26,7 +31,7 @@ public class Util {
                      Util.class.getClassLoader().getResourceAsStream("application.properties")) {
             PROPERTIES.load(resourceAsStream);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
@@ -35,8 +40,30 @@ public class Util {
             return DriverManager.getConnection(get("url"), get("username"), get("password"));
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    private static SessionFactory sessionFactory;
+
+    static {
+        try {
+            Configuration configuration = new Configuration();
+            configuration.addAnnotatedClass(User.class);
+            sessionFactory = configuration.buildSessionFactory();
+
+        } catch (HibernateException e) {
+            e.printStackTrace();
         }
     }
+
+    public static SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
 }
+
+
 
